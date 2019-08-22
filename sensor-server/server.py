@@ -1,34 +1,66 @@
+#!/usr/bin/env python
+
 #Sensor Server
 #by Matt
 #release 1.1
 #Support USB2CAN & PCAN
 
 import can #main library handling the devices
-import math #currently not required
+import math
 import time #timing purposes
-import getopt #currently not required
-import sys #currently not required
-import string #currently not required
+import getopt
+import sys
+import string
 import os
-import thread #currently not required
+import thread
 import util #currently not required
-import threading #currently not required
+import threading
 import types
 import csv
 import socket
 
+import serial
+
+import ConfigParser #for INI parsing
+import io #for INI parsing
+
+#parse the INI file
+with open("config.ini") as f:
+    sample_config = f.read()
+config = ConfigParser.RawConfigParser(allow_no_value=True)
+config.readfp(io.BytesIO(sample_config))
+
+if config.get('controller', 'id_base'):
+    id_base = int(config.get('controller', 'id_base'))
+else:
+    id_base = 0x201 #Target ID of the MTB
+if config.get('controller', 'num_sda'):
+    num_sda = int(config.get('controller', 'num_sda'))
+else:
+    num_sda = 4 #number of sdas
+if config.get('controller', 'num_chip'):
+    num_of_chip = int(config.get('controller', 'num_chip'))
+else:
+    num_of_chip = 4 #number of chips per sda
+if config.get('controller', 'num_brd'):
+    num_of_board = int(config.get('controller', 'num_brd'))
+else:
+    num_of_board = 1 #how many controllers
+if config.get('CAN', 'bustype') and config.get('CAN','channel'):
+    can_bustype = config.get('CAN', 'bustype')
+    can_channel = config.get('CAN', 'channel')
+else:
+    print "Config not available"
+    exit()
+
 conn = type('',(),{})() #define the empty server object in case there is failure before it is ready to be started
 stop_threads = False #variable to stop all threads
 
-id_base = 0x200 #Target ID of the MTB
 cif_array = {} #can interface array
 cmsg_array = {} #array for message handlers
-num_of_board = 1 #how many controllers
 board_start_num = 1 #first controller number
 csvfile = type('',(),{})() #define the object for csvfile creation
 
-num_sda = 4 #number of sdas
-num_of_chip = 4 #number of chips per sda
 num_taxel = num_sda * num_of_chip #total taxels per sensor
 
 #define function to send data to controllers
@@ -70,6 +102,8 @@ def stopSystem(e = "", msg = type('',(),{})()):
     except Exception,e:
         print("Unable to close CSV file, Error: {}".format(e))
     try:
+        conn.shutdown(1)
+        time.sleep(2)
         conn.close()
     except Exception,e:
         print("Unable to disable the server, Error: {}".format(e))
@@ -78,13 +112,25 @@ def stopSystem(e = "", msg = type('',(),{})()):
 ############################# setup ######################################
 
 for j in range(board_start_num, num_of_board+board_start_num): #setup the interfaces
-    try:#start PCAN
-        cif_array[j,0] = can.interface.Bus(bustype='pcan', channel='PCAN_USBBUS1', bitrate=1000000)
-    except Exception:#if not possible
-        try:#start USB2CAN
-            cif_array[j,0] = can.interface.Bus(channel='ED000200', bustype='usb2can', bitrate=1000000)
-        except Exception:#no CAN possible
-            stopSystem("CAN not available")#we can't continue, so lets close the app
+    #try:#start PCAN
+    #    cif_array[j,0] = can.interface.Bus(bustype='pcan', channel='PCAN_USBBUS1', bitrate=1000000)
+    #except Exception:#if not possible
+    #    try:#start USB2CAN
+    #        cif_array[j,0] = can.interface.Bus(channel='ED000200', bustype='usb2can', bitrate=1000000)
+    #    except Exception:#no CAN possible
+    #        stopSystem("CAN not available")#we can't continue, so lets close the app
+    #cif_array[j,0] = cantact.CantactDev("COM5") # Connect to CANable that enumerated as ttyACM0
+    #cif_array[j,0].set_bitrate(1000000) # Set the bitrate to a 1Mbaud
+    #cif_array[j,0].start() # Go on the bus
+
+    #can serial is bustype='serial' or bustype='slcan'.
+    #this way the commands will stay the same, no extra changes required
+    #cif_array[j,0] = serial.Serial(can_port, baudrate=1000000)
+    try:
+        cif_array[j,0] = can.interface.Bus(bustype=can_bustype, channel=can_channel, bitrate=1000000, ttyBaudrate=1000000)
+    except Exception,e:
+        print("Error connecting to CAN: {}".format(e))
+        exit()
 
 for j in range(board_start_num, num_of_board+board_start_num): #setup the message handlers
     for k in range(0, num_taxel):
@@ -96,10 +142,25 @@ sendToAllControllers([7,0])#Let's start all controllers
 address_list = []
 CAN_address = []
 CAN_temp = []
-address_list = [0x100, 0x101, 0x102, 0x103,
-               0x110, 0x111, 0x112, 0x113,
-                0x120, 0x121, 0x122, 0x123,
-               0x130, 0x131, 0x132, 0x133]
+#load correct addresslist
+if num_sda == 4 and num_of_chip == 4:
+    address_list = [0x100, 0x101, 0x102, 0x103,
+                    0x110, 0x111, 0x112, 0x113,
+                    0x120, 0x121, 0x122, 0x123,
+                    0x130, 0x131, 0x132, 0x133
+                    ]
+elif num_sda == 4 and num_of_chip == 6:
+    address_list = [0x130, 0x131, 0x132, 0x133, 0x134, 0x135,
+                    0x120, 0x121, 0x122, 0x123, 0x124, 0x125,
+                    0x110, 0x111, 0x112, 0x113, 0x114, 0x115,
+                    0x100, 0x101, 0x102, 0x103, 0x104, 0x105
+                    ]
+else:
+    address_list = [0x100, 0x101, 0x102, 0x103,
+                    0x110, 0x111, 0x112, 0x113,
+                    0x120, 0x121, 0x122, 0x123,
+                    0x130, 0x131, 0x132, 0x133
+                    ]
 CAN_address.append(address_list)
 print('Setup is completed')
 
@@ -109,7 +170,7 @@ print('Please wait')
 
 mlx_buffer = {}
 for j in range (board_start_num, num_of_board+board_start_num): #give default values to all buffer elements to avoid reference errors
-	for k in range(0,16):
+	for k in range(0,num_taxel):
 		key = {}
 		for l in range(1,7):
 			key[l] = 0x00
@@ -169,6 +230,7 @@ TCP_IP = '127.0.0.1'
 TCP_PORT = 5007
 BUFFER_SIZE = 1
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
 conn, addr = s.accept()
@@ -188,10 +250,8 @@ for l in range(1,7):
 for j in range (0, num_of_board+board_start_num):
 	for k in range(0,num_taxel):
 		mlx_buffer[j,k] = key
-err_count = 0
 
 def canReader():
-    global err_count
     global mlx_buffer
     global cif_array
     global num_of_board
@@ -203,9 +263,15 @@ def canReader():
             break
         for j in range (board_start_num, num_of_board+board_start_num):
             msg = cif_array[j,0].recv(1)
-            for k in range(0,num_taxel):
-                arb = address_list.index(msg.arbitration_id)
-                mlx_buffer[j-board_start_num,arb] = memoryview(msg.data).tolist()
+            for _ in range(0,num_taxel):
+                try:
+                    arb = address_list.index(msg.arbitration_id)
+                    mlx_buffer[j-board_start_num,arb] = memoryview(msg.data).tolist()
+                except ValueError:
+                    pass
+                except Exception,e:
+                    stopSystem("Error in thread-1 ({})".format(e))
+                    break
 
 #add worker
 t = threading.Thread(target=canReader)
