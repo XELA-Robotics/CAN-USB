@@ -145,7 +145,7 @@ def init_treshold():
             tres[i] = [tresholds[i*3],tresholds[i*3+1],tresholds[i*3+2]]
         except IndexError as e:
             print("[Tres] Error at index {}: {}".format(i,e))
-init_treshold()
+
 
 
 def convert(list):
@@ -177,9 +177,9 @@ def calc(a,b,c=-1,d=-1):
         valnew = translate(dbyte,tres[c][2],256*256,0.0,maxsize)
     elif d==1:
         if dbyte<tres[c][0]:
-            valnew = translate(dbyte,0,tres[c][0],-maxval,0.0)
+            valnew = translate(dbyte,0,tres[c][0],-maxval,0.0)*(-1)
         else:
-            valnew = translate(dbyte,tres[c][0],256*256,0.0,maxval)
+            valnew = translate(dbyte,tres[c][0],256*256,0.0,maxval)*(-1)
     else:
         if dbyte<tres[c][1]:
             valnew = translate(dbyte,0,tres[c][1],-maxval,0.0)*(-1)
@@ -191,13 +191,14 @@ def calc(a,b,c=-1,d=-1):
 def realCalc(obj_id):
     global datastream,positions
     data = datastream[obj_id]
-    val_x = calc(data[2],data[3],obj_id,1)
-    val_y = calc(data[0],data[1],obj_id,0)
+    val_x = calc(data[0],data[1],obj_id,0)
+    val_y = calc(data[2],data[3],obj_id,1)
     pos = positions[obj_id]
     return float(calc(data[4],data[5],obj_id,2)),(float(pos[0]+val_x),float(pos[1]+val_y))
 
 def setReady():
     global tst
+    init_treshold()
     for i in range(0,len(tst)):
         tst[i].set_facecolor(circle_color)
     return convert(tst)
