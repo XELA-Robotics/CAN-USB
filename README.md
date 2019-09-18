@@ -1,16 +1,12 @@
 # CAN-USB
 Code for Xela sensors
 
+In folder ''sensor-server'' are following files:
 Server file is _server.py(c)_\
-Visualization file is _visualizaer.py(c)_\
-Configuration file is _config.ini_ 
-> running _configurator.py(c)_ will help to set up proper config file
-Files required for pyhton-can (with specific USB-CAN adapters)
-```
-PCANBasic.dll
-usb2can.dll
-usb2can.lib
-```
+Visualization file is _visualization.py(c)_\
+Configuration file is _config.ini_ \
+Linux config app is _run-server.sh_
+>_run-server.sh_ on Linux can help by making the correct _config.ini_ file
 
 List of suitable USB-CAN controllers:
 >Note: Windows is very unreliable with the devices and support is minimal
@@ -63,8 +59,8 @@ Timings (ms/120 reads):
    - [x] CANable/CANable Pro with candlelight firmware (Linux only)
    - [x] PCAN (Linux + Windows)
    - [x] ~~8devices USB-CAN~~ *Removed as product is discontinued*
-- [x] Configuration system for:
-   - [x] Windows
+- [ ] Configuration system for:
+   - [ ] Windows
    - [x] Linux
 
 
