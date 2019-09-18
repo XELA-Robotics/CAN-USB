@@ -4,17 +4,64 @@ In this folder will be all versions of xela server for ROS
 
 Once file is unpacked, run following commands:
 ```console
-user@ROS:~$ catkin_make -DCMAKE_INSTALL_PREFIX=path/to/folder install
+user@ROS:~$ catkin_make -DCMAKE_INSTALL_PREFIX=path/to/xela_sensors_ros install
 ```
 and
 ```console
 user@ROS:~$ echo "source ~/catkin_ws/install/setup.bash" >> ~/.bashrc
+or
+user@ROS:~$ echo "source path/to/xela_sensors_ros/setup.bash" >> ~/.bashrc
 ```
 
 more info at [wiki.ros.org/catkin/commands/catkin_make](http://wiki.ros.org/catkin/commands/catkin_make)
 
+### Before you start:
+> The sensors need to be configured and server set up
+```console
+user@ROS:~$ rosrun xela_server xConf.pyc
+```
 
 Files ___4x4.ini___, ___4x6.ini___ and ___xServ.ini___ must be moved to ___/etc/xela___ folder
+
+### How to use:
+> 1st, start your ROS core
+```console
+user@ROS:~$ roscore
+```
+> 2nd, start Xela server
+```console
+user@ROS:~$ rosrun xela_server xServer.pyc
+```
+> 3rd, start message service
+```console
+user@ROS:~$ rosrun xela_sensors xSensorService.pyc
+```
+> 4th, run your code or Xela Visualizer
+```console
+user@ROS:~$ rosrun xela_server xViz.pyc
+```
+
+### Available services:
+
+| service | use case | example |
+| --- | --- | --- |
+| xServX | to get only X coordinate of taxel | data = srv(1,2) #Sensor 1, taxel 2 |
+| xServY | to get only Y coordinate of taxel | data = srv(1,2) #Sensor 1, taxel 2 |
+| xServZ | to get only Z coordinate of taxel | data = srv(1,2) #Sensor 1, taxel 2 |
+| xServXY | to get only X and Y coordinates of taxel | data = srv(1,2) #Sensor 1, taxel 2 |
+| xServXYZ | to get all X, Y and Z coordinates of taxel | data = srv(1,2) #Sensor 1, taxel 2 |
+| xServStream | to get only X coordinate of taxel | data = srv(1) #Sensor 1 |
+
+### Available message types:
+
+| message name | response | example |
+| --- | --- | --- |
+| XelaSensorX | value | value: 16457 |
+| XelaSensorY | value | value: 16457 |
+| XelaSensorZ | value | value: 16457 |
+| XelaSensorXY | values | values: [16457, 16553] |
+| XelaSensorXYZ | values | values: [16457, 16553, 32057] |
+| XelaSensorStream | xyz | xyz: [1: [16457, 16553, 32057], 2: [16775, 16958, 31886] ] |
 
 ### Example usage:
 ```python
@@ -32,11 +79,23 @@ rospy.init_node('use_service')
 rospy.wait_for_service('xela_sensors')
  
 #setup a local proxy for the service
-srv=rospy.ServiceProxy('xela_sensors',XelaSensorXYZ)
+srv=rospy.ServiceProxy('xServXYZ',XelaSensorXYZ)
  
 #use the service and send it a value. In this case, I am sending sensor: 1 and taxel: 3
 service_example=srv(1,3)
  
 #print the result from the service
 print service_example
+```
+
+### Changelog:
+>0.0.2
+```
+[+] Add configuration
+[+] Add Visualization
+[~] Optimization
+```
+>0.0.1
+```
+[~] Initial release
 ```
