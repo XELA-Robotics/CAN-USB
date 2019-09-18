@@ -148,12 +148,22 @@ fig = plt.figure(facecolor='black')
 fig.set_dpi(100)
 fig.set_size_inches(7, 6.5)
 #check if better icon exists
-print("Check if {} exists".format("{}".format(path2i)))
+#print("Check if {} exists".format("{}".format(path2i)))
 if os.path.isfile("{}".format(path2i)):
-    print("new icon found")
-    thismanager = plt.get_current_fig_manager()
-    img = tk.PhotoImage(file="{}".format(path2i))
-    thismanager.window.tk.call('wm', 'iconphoto', thismanager.window._w, img)
+#    print("new icon found")
+#    thismanager = plt.get_current_fig_manager()
+#    thismanager.window.tk.call('wm', 'iconphoto', thismanager.window._w, img)
+    try:
+        window.iconbitmap(default="{}".format(path2i))
+    except Exception:
+        pass
+    try:
+        thismanager = plt.get_current_fig_manager()
+        img = tk.PhotoImage(file="{}".format(path2i))
+        thismanager.window.tk.call('wm', 'iconphoto', thismanager.window._w, img)
+    except Exception:
+        pass
+
 
 figcfg = plt.gcf()
 if num_of_board > 1:

@@ -13,7 +13,7 @@ if osname == "Windows":
     path2 = fnamewpath[0:(len(fnamewpath)-len(fnamenpath))].replace("\\","/")
     path2p = 'python "{}"'.format(path2)
     path2ini = path2 + "config.ini"
-    path2i = "{}xela.png".format(path2)
+    path2i = "{}xela.ico".format(path2)
 else:
     #in Linux the config should be always in /etc/xela folder
     path2 = "/etc/xela/"
@@ -50,17 +50,25 @@ def updateView():
 #define possible bus types
 bustype = [
     "socketcan",
-    "esd",
     "pcan",
     "slcan"
     ]
-
+if osname == "Windows":
+    bustype = [
+        "esd",
+        "pcan"
+    ]
 #define possible ports
 channel = [
     "can0",
     "PCAN_USBBUS1",
     "slcan0"
 ]
+if osname == "Windows":
+    channel = [
+        "None",
+        "PCAN_USBBUS1"
+    ]
 def showOptions(elemList,title = ""):
     global but, answered
     answered = False
@@ -98,14 +106,20 @@ window.geometry("900x500")
 #    print("new icon found")
 #    window.iconbitmap("{}xela.ico".format(path2i))
 #check if better icon exists
-print("Check if {} exists".format("{}".format(path2i)))
+#print("Check if {} exists".format("{}".format(path2i)))
 if os.path.isfile("{}".format(path2i)):
-    print("new icon found")
+#    print("new icon found")
 #    thismanager = plt.get_current_fig_manager()
-    img = tk.PhotoImage(file="{}".format(path2i))
 #    thismanager.window.tk.call('wm', 'iconphoto', thismanager.window._w, img)
-#    window.iconbitmap(default="{}".format(path2i))
-    window.tk.call('wm', 'iconphoto', window._w, img)
+    try:
+        window.iconbitmap(default="{}".format(path2i))
+    except Exception:
+        pass
+    try:
+        img = tk.PhotoImage(file="{}".format(path2i))
+        window.tk.call('wm', 'iconphoto', window._w, img)
+    except Exception:
+        pass
 
 window.resizable(width=tk.FALSE, height=tk.FALSE)
 window.columnconfigure(1,weight=1)
