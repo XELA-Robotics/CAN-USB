@@ -12,6 +12,8 @@ usb2can.dll
 usb2can.lib
 ```
 
+> Run xela.exe to Install full system for Windows _(Tested 2019/09/19 on Windows 10, result ![][~TestOK])_
+
 List of suitable USB-CAN controllers:
 >Note: Windows is very unreliable with the devices and support is minimal
 
@@ -74,3 +76,4 @@ Timings (ms/120 reads):
 [~LinOK]: https://img.shields.io/badge/-Linux-brightgreen
 [~LinSoSo]: https://img.shields.io/badge/-Linux-yellow
 [~LinBad]: https://img.shields.io/badge/-Linux-red
+[~TestOK]: https://img.shields.io/badge/-Success-brightgreen
