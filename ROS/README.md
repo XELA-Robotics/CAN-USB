@@ -16,12 +16,34 @@ user@ROS:~$ echo "source path/to/xela_sensors_ros/setup.bash" >> ~/.bashrc
 more info at [wiki.ros.org/catkin/commands/catkin_make](http://wiki.ros.org/catkin/commands/catkin_make)
 
 ### Before you start:
+
+>Please make sure you have the suitable Python version installed.
+```console
+Python 2.7
+```
+>The required libraries are following:
+```console
+numpy
+matplotlib
+easygui
+python-can
+Tkinter
+```
+>Optional libraries are following:
+```console
+coloredlogs
+verboselogs
+```
 > The sensors need to be configured and server set up
 ```console
 user@ROS:~$ rosrun xela_server xConf.pyc
 ```
+> As the configuration file needs to be located in #/etc/xela# folder, you might need to create it with correct access permissions prior to launching the configuration tool.
 
-Files ___4x4.ini___, ___4x6.ini___ and ___xServ.ini___ must be moved to ___/etc/xela___ folder
+> Run the configuration tool
+```console
+user@ROS:~$ python /path/to/xela/nodes/xela_server/scripts/xConf.pyc
+```
 
 ### How to use:
 > 1st, start your ROS core
@@ -89,6 +111,13 @@ print service_example
 ```
 
 ### Changelog:
+>0.0.3
+```
+[+] Add coloring to the output
+[+] Include src folder in the package so everyone can compile on their own
+[~] Optimization
+[!] Made for Python 2.7 only
+```
 >0.0.2
 ```
 [+] Add configuration
