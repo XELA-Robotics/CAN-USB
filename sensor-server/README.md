@@ -1,6 +1,30 @@
 # CAN-USB
 Code for Xela sensors
 
+## Versions
+1. __xela.exe__ Windows 10 Installer (Sept 2019 version, limited usability)
+2. __Linux.zip__ Linux Standalone (Dec 2019 version, limited usability)
+3. __Windows.zip__ Windows Standalone (Dec 2019 version, limited usability)
+4. __Xela_Server_Suite_0.2.3_Linux_Standalone.zip__ Linux Standalone (Dec 2019 Suite version, experimental)
+
+## Required Python modules:
+1) Tkinter
+2) numpy
+3) matplotlib (version 2+, 2.2.4 recommended, if you get errors in Visualizer, it might be outdated)
+4) python-can
+5) psutil (normally installed)
+
+## Use
+1. With Xela Server Suite:
+> 1) Unpack the zip file and open termainl in the folder where files are.
+> 2) run ___./xela___ in terminal
+> 3) start __Xela Configurator__ in __Xela Commander__ (to set up your connected sensors)
+> 4) save configuration (instructions in terminal)
+> 5) start __Xela Server__ in __Xela Commander__
+> 6) once connected to the server, you can press __Show visual__ button to open __Xela Visualizer__ for that sensor
+> 7) close all __Visualizers__ and the __Server__ before exiting the __Xela Commander__
+
+2. With regular standalone:
 Server file is _server.py(c)_\
 Visualization file is _visualizaer.py(c)_\
 Configuration file is _config.ini_ 
@@ -68,6 +92,7 @@ Timings (ms/120 reads):
 - [x] Configuration system for:
    - [x] Windows
    - [x] Linux
+- [ ] Update readme files
 
 
 [~WinOK]: https://img.shields.io/badge/-Windows-brightgreen
