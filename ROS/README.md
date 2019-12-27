@@ -41,11 +41,11 @@ user@ROS:~$ rosrun xela_server xela
 ```console
 user@ROS:~$ rosrun xela_server xela_conf
 ```
-> As the configuration file needs to be located in #/etc/xela# folder, you might need to create it with correct access permissions prior to launching the configuration tool.
+> As the configuration file needs to be located in _/etc/xela_ folder, you might need to create it with correct access permissions prior to launching the configuration tool.
 
 > Run the configuration tool
 ```console
-user@ROS:~$ python /path/to/xela/nodes/xela_server/scripts/xConf.pyc
+user@ROS:~$ python /path/to/xela/nodes/xela_server/scripts/xela_conf
 ```
 
 ## How to use:
@@ -56,15 +56,15 @@ user@ROS:~$ roscore
 ```
 > 2nd, start Xela server
 ```console
-user@ROS:~$ rosrun xela_server xServer.pyc
+user@ROS:~$ rosrun xela_server xela_server
 ```
 > 3rd, start message service
 ```console
-user@ROS:~$ rosrun xela_sensors xSensorService.pyc
+user@ROS:~$ rosrun xela_sensors xela_service
 ```
 > 4th, run your code or Xela Visualizer
 ```console
-user@ROS:~$ rosrun xela_server xViz.pyc
+user@ROS:~$ rosrun xela_server xela_viz
 ```
 ### Automatic
 > Run everything through Xela Command Centre
